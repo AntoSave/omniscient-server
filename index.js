@@ -5,7 +5,7 @@ const postgres = require('./postgres')
 const {	ValidationError } = require("express-json-validator-middleware");
 const cameraRouter = require("./routes/cameras")
 const roomRouter = require("./routes/rooms")
-
+const sensorRouter = require("./routes/sensors")
 const PORT = process.env.PORT || 5000
 
 function validationErrorMiddleware(error, request, response, next) {
@@ -32,6 +32,7 @@ postgres.connect().then(()=>{
   app.use(bodyParser.json()) //Da eseguire prima di definire le routes. Entra in funzione solo se Content-Type: application/json
   app.use("/cameras", cameraRouter)
   app.use("/rooms", roomRouter)
+  app.use("/sensors", sensorRouter)
   app.use(validationErrorMiddleware)
     //.use(express.static(path.join(__dirname, 'public')))
     //.set('views', path.join(__dirname, 'views'))

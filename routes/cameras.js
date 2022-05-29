@@ -2,7 +2,6 @@ const express = require('express')
 const router = express.Router()
 const postgres = require('../postgres')
 const { Validator } = require("express-json-validator-middleware");
-const { response } = require('express');
 const { validate } = new Validator();
 
 const cameraSchema = {
@@ -36,24 +35,71 @@ const cameraSchema = {
 	},
 };
 
-router.get("/", (req,res) => {
-  res.send("Cameras endpoint")
-})
+const cameraPKSchema = {
+	type: "object",
+	required: ["name", "room_name"],
+	properties: {
+		name: {
+			type: "string",
+			minLength: 1
+		},
+		room_name: {
+			type: "string",
+			minLength: 1
+		}
+  }
+};
 
-router.post("/create", validate({ body:cameraSchema }), (req,res,next) => {
-  const payload = req.body
-  const query = 'INSERT INTO CAMERAS("name",room_name,room_user,domain,port,username,password) VALUES ($1,$2,$3,$4,$5,$6,$7)'
-  const data = [payload.name,payload.room_name,'default',payload.domain,payload.port,payload.username,payload.password]
-  console.log(payload.name,payload.room_name,'default',payload.domain,payload.port,payload.username,payload.password)
-  postgres.getClient().query(query, data, (err,res) => {
-    if(err){
-      response.status(400).json({status: "ERROR", error: err, stack:err.stack})
+router.get("/", (req,res,next) => {
+  let username = 'default'
+  const query = 'SELECT * FROM CAMERAS WHERE room_user=$1'
+  const data = [username]
+  console.log("GETTING CAMERAS:",...data)
+  postgres.getClient().query(query, data, (error,result) => {
+    if(error){
+      res.status(400).json({status: "ERROR", error: error, stack:error.stack})
     }
     else {
-      response.status(200).json({status: "SUCCESS", res:res})
+      res.status(200).json([...result.rows])
     }
     next()
   })
 })
+
+router.post("/", validate({ body: cameraSchema }), (req,res,next) => {
+  let username = 'default'
+  const payload = req.body
+  const query = 'INSERT INTO CAMERAS("name",room_name,room_user,domain,port,username,password) VALUES ($1,$2,$3,$4,$5,$6,$7)'
+  const data = [payload.name,payload.room_name,username,payload.domain,payload.port,payload.username,payload.password]
+  console.log("CREATING CAMERA:",...data)
+  postgres.getClient().query(query, data, (error,result) => {
+    if(error){
+      res.status(400).json({status: "ERROR", error: error, stack:error.stack})
+    }
+    else {
+      res.status(200).json({status: "SUCCESS", rows_number:result.rowCount})
+    }
+    next()
+  })
+})
+
+router.delete("/", validate({ body: cameraPKSchema }), (req,res,next) => {
+  let username = 'default'
+  const payload = req.body
+  const query = 'DELETE FROM CAMERAS WHERE "name" = $1 AND room_name = $2 AND room_user = $3'
+  const data = [payload.name,payload.room_name,username]
+  console.log("DELETING CAMERA:",...data)
+  postgres.getClient().query(query, data, (error,result) => {
+    if(error){
+      res.status(400).json({status: "ERROR", error: error, stack:error.stack})
+    }
+    else {
+      res.status(200).json({status: "SUCCESS", rows_number:result.rowCount})
+    }
+    next()
+  })
+})
+
+//Il metodo di update per ora è omesso: un update si può fare con una cancellazione e una creazione
 
 module.exports = router
