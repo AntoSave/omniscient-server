@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const postgres = require('./postgres')
+const postgres = require('../postgres')
 const { Validator } = require("express-json-validator-middleware");
 const { response } = require('express');
 const { validate } = new Validator();
