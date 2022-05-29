@@ -44,7 +44,7 @@ router.post("/create", validate({ body:cameraSchema }), (req,res,next) => {
   const payload = req.body
   const query = 'INSERT INTO CAMERAS("name",room_name,room_user,domain,port,username,password) VALUES ($1,$2,$3,$4,$5,$6,$7)'
   const data = [payload.name,payload.room_name,'default',payload.domain,payload.port,payload.username,payload.password]
-  client.query(query, data, (err,res) => {
+  postgres.client.query(query, data, (err,res) => {
     if(err){
       response.status(400).json({status: "ERROR", error: err, stack:err.stack})
     }
