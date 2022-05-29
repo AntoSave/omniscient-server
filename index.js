@@ -25,18 +25,20 @@ function validationErrorMiddleware(error, request, response, next) {
 	next();
 }
 
-await postgres.connect()
-console.log('[DB] Successfully connected to Postgres')
-app = express()
+postgres.connect().then(()=>{
+  console.log('[DB] Successfully connected to Postgres')
+  app = express()
+  
+  app.use(bodyParser.json()) //Da eseguire prima di definire le routes. Entra in funzione solo se Content-Type: application/json
+  app.use("/cameras", cameraRouter)
+  app.use("/rooms", roomRouter)
+  app.use(validationErrorMiddleware)
+    //.use(express.static(path.join(__dirname, 'public')))
+    //.set('views', path.join(__dirname, 'views'))
+    //.set('view engine', 'ejs')
+    //.get('/', (req, res) => res.render('pages/index'))
+  
+  console.log('[EXPRESS] Routes attached')
+  app.listen(PORT, () => console.log(`[EXPRESS] Listening on ${ PORT }`))
+}).catch(err => console.log("[POSTGRES] Error: can't connect to DB!"))
 
-app.use(bodyParser.json()) //Da eseguire prima di definire le routes. Entra in funzione solo se Content-Type: application/json
-app.use("/cameras", cameraRouter)
-app.use("/rooms", roomRouter)
-app.use(validationErrorMiddleware)
-  //.use(express.static(path.join(__dirname, 'public')))
-  //.set('views', path.join(__dirname, 'views'))
-  //.set('view engine', 'ejs')
-  //.get('/', (req, res) => res.render('pages/index'))
-
-console.log('[EXPRESS] Routes attached')
-app.listen(PORT, () => console.log(`[EXPRESS] Listening on ${ PORT }`))
