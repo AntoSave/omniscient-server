@@ -1,7 +1,7 @@
 {
-  "name": "node-js-getting-started",
-  "version": "0.3.0",
-  "description": "A sample Node.js app using Express 4",
+  "name": "omniscient-api",
+  "version": "0.0.1",
+  "description": "API per omniscient",
   "engines": {
     "node": "16.x"
   },
@@ -11,8 +11,10 @@
     "test": "node test.js"
   },
   "dependencies": {
+    "body-parser": "^1.20.0",
     "ejs": "^3.1.5",
-    "express": "^4.15.2"
+    "express": "^4.15.2",
+    "pg": "^8.7.3"
   },
   "devDependencies": {
     "got": "^11.3.0",
