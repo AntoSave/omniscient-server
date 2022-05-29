@@ -25,7 +25,7 @@ function validationErrorMiddleware(error, request, response, next) {
 	next();
 }
 
-postgres.connect()
+await postgres.connect()
 console.log('[DB] Successfully connected to Postgres')
 app = express()
 
@@ -38,5 +38,5 @@ app.use(validationErrorMiddleware)
   //.set('view engine', 'ejs')
   //.get('/', (req, res) => res.render('pages/index'))
 
-console.log('[EXPRESS] Successfully connected to Postgres')
+console.log('[EXPRESS] Routes attached')
 app.listen(PORT, () => console.log(`[EXPRESS] Listening on ${ PORT }`))
