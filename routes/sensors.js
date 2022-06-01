@@ -20,6 +20,7 @@ router.get("/", (req,res,next) => {
 })
 
 router.get("/state", (req,res,next) => {
+  console.log(process.env.STACKHERO_INFLUXDB_HOST,process.env.STACKHERO_INFLUXDB_ORGANIZATION,process.env.INFLUX_API_TOKEN)
   let username = 'default'
   let state = {
     sensor_status:[],
@@ -122,7 +123,7 @@ router.get("/state", (req,res,next) => {
     influx.queryApi.queryRows(query,{
       next: (row,tableMeta) => {
         const o = tableMeta.toObject(row)
-        console.log(o)
+        //console.log(o)
         if(!(o.sensor_id in state.analog_sensor_data)){
           state.analog_sensor_data[o.sensor_id] = {
             id: o.sensor_id,
