@@ -86,7 +86,7 @@ router.get("/state", (req,res,next) => {
   const promise3 = new Promise((resolve,reject) => {
     query=`
     from(bucket:"admin")
-      |> range(start: -10m)
+      |> range(start: -1m)
       |> filter(fn:(r) => r["_measurement"] == "sensor_value" and r["_field"] == "value" and r["sensor_type"] == "MOVEMENT")
       |> group(columns: ["sensor_id"])
       |> sort(columns: ["_time"], desc: true)
@@ -115,7 +115,7 @@ router.get("/state", (req,res,next) => {
   const promise4 = new Promise((resolve,reject) => {
     query=`
     from(bucket:"admin")
-      |> range(start: -10m)
+      |> range(start: -2m)
       |> filter(fn:(r) => r["_measurement"] == "sensor_value" and r["_field"] == "value" and (r["sensor_type"] == "LIGHT" or r["sensor_type"] == "TEMPERATURE"))
       |> group(columns: ["sensor_id"])
       |> sort(columns: ["_time"], desc: true)
