@@ -23,7 +23,7 @@ router.get("/state", (req,res,next) => {
   //console.log(process.env.STACKHERO_INFLUXDB_HOST,process.env.STACKHERO_INFLUXDB_ADMIN_ORGANIZATION,process.env.INFLUX_API_TOKEN)
   let username = 'default'
   let state = {
-    sensor_status:[],
+    sensor_status:{},
     analog_sensor_data:{},
     digital_sensor_data:{}
   }
@@ -41,10 +41,10 @@ router.get("/state", (req,res,next) => {
       next: (row,tableMeta) => {
         const o = tableMeta.toObject(row)
         //console.log(o)
-        state.sensor_status.push({
+        state.sensor_status[o.sensor_id]={
           id:o.sensor_id,
           status:o._value
-        })
+        }
       },
       error: error => reject(error),
       complete: () => resolve()
