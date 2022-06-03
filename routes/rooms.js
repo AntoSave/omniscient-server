@@ -54,7 +54,18 @@ router.get("/", (req,res,next) => {
       res.status(400).json({status: "ERROR", error: error, stack:error.stack})
     }
     else {
-      res.status(200).json([...result.rows])
+      res.status(200).json(result.rows.map((value,index,array) => {
+        return {
+          name:value.name,
+          user:value.user,
+          color:{
+            red:value.colorRed,
+            blue:value.colorBlue,
+            green:value.colorGreen,
+            alpha:value.colorAlpha
+          }
+        }
+      }))
     }
     next()
   })
