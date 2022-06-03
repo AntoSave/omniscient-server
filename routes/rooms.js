@@ -33,7 +33,16 @@ const roomSchema = {
     
   }
 };
-
+const roomPKSchema = {
+	type: "object",
+	required: ["name"],
+	properties: {
+		name: {
+			type: "string",
+			minLength: 1
+		}
+  }
+};
 
 router.get("/", (req,res,next) => {
   let username = 'default'
@@ -68,7 +77,7 @@ router.post("/", validate({ body: roomSchema }), (req,res,next) => {
   })
 })
 
-router.delete("/", validate({ body: roomSchema }), (req,res,next) => {
+router.delete("/", validate({ body: roomPKSchema }), (req,res,next) => {
   let username = 'default'
   const payload = req.body
   const query = 'DELETE FROM ROOMS WHERE "name" = $1 AND "user" = $2'
