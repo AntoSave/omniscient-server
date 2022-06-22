@@ -50,6 +50,7 @@ const cameraPKSchema = {
   }
 };
 
+/*Restituisce tutte le telecamere dell'utente*/
 router.get("/", (req,res,next) => {
   let username = 'default'
   const query = 'SELECT * FROM CAMERAS WHERE room_user=$1'
@@ -66,6 +67,7 @@ router.get("/", (req,res,next) => {
   })
 })
 
+/*Aggiunge una telecamera all'utente*/
 router.post("/", validate({ body: cameraSchema }), (req,res,next) => {
   let username = 'default'
   const payload = req.body
@@ -83,6 +85,7 @@ router.post("/", validate({ body: cameraSchema }), (req,res,next) => {
   })
 })
 
+/*Elimina una telecamera dell'utente*/
 router.delete("/", validate({ body: cameraPKSchema }), (req,res,next) => {
   let username = 'default'
   const payload = req.body

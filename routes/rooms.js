@@ -44,6 +44,7 @@ const roomPKSchema = {
   }
 };
 
+/*Restituisce tutte le stanze dell'utente*/
 router.get("/", (req,res,next) => {
   let username = 'default'
   const query = 'SELECT * FROM ROOMS WHERE "user"=$1'
@@ -71,6 +72,7 @@ router.get("/", (req,res,next) => {
   })
 })
 
+/*Aggiunge una stanza all'utente*/
 router.post("/", validate({ body: roomSchema }), (req,res,next) => {
   let username = 'default'
   const payload = req.body
@@ -88,6 +90,7 @@ router.post("/", validate({ body: roomSchema }), (req,res,next) => {
   })
 })
 
+/*Elimina una stanza dell'utente*/
 router.delete("/", validate({ body: roomPKSchema }), (req,res,next) => {
   let username = 'default'
   const payload = req.body
