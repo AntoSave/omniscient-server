@@ -49,7 +49,7 @@ router.post("/alarmed", [validate({ body: setAlarmedSchema }), verifyTokenMiddle
     if(payload.setAlarmed==false){
       const query = 
         `SELECT A.id
-        FROM ACTUATORS
+        FROM ACTUATORS A
         WHERE A.type='BUZZER'
         AND A.owner=$1`
       const data = [username]
