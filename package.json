@@ -13,12 +13,16 @@
   "dependencies": {
     "@influxdata/influxdb-client": "^1.26.0",
     "@influxdata/influxdb-client-apis": "^1.26.0",
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.0",
     "dotenv": "^16.0.1",
     "ejs": "^3.1.5",
     "express": "^4.15.2",
     "express-json-validator-middleware": "^3.0.1",
-    "pg": "^8.7.3"
+    "jsonwebtoken": "^8.5.1",
+    "pg": "^8.7.3",
+    "uuid": "^8.3.2",
+    "ws": "^8.8.0"
   },
   "devDependencies": {
     "got": "^11.3.0",

@@ -4,7 +4,7 @@ const postgres = require('../postgres')
 const influx = require('../influx')
 const { Validator } = require("express-json-validator-middleware");
 const { validate } = new Validator();
-
+const {verifyTokenMiddleware} = require('../middleware/authentication-middleware')
 const sensorSchema = {
 	type: "object",
 	required: ["id","name","type","room_name"],
@@ -39,8 +39,8 @@ const sensorPKSchema = {
 };
 
 /*Restituisce tutti i sensori dell'utente*/
-router.get("/", (req,res,next) => {
-  let username = 'default'
+router.get("/", [verifyTokenMiddleware], (req,res,next) => {
+  let username = req.username
   const query = 'SELECT * FROM SENSORS WHERE room_user=$1'
   const data = [username]
   console.log("GETTING SENSORS:",...data)
@@ -55,8 +55,8 @@ router.get("/", (req,res,next) => {
   })
 })
 
-router.post("/", validate({ body: sensorSchema }), (req,res,next) => {
-  let username = 'default'
+router.post("/", [validate({ body: sensorSchema }),verifyTokenMiddleware], (req,res,next) => {
+  let username = req.username
   const payload = req.body
   const query = 'INSERT INTO SENSORS(id,"name",type,room_name,room_user) VALUES ($1,$2,$3,$4,$5)'
   const data = [payload.id,payload.name,payload.type,payload.room_name,username]
@@ -72,8 +72,8 @@ router.post("/", validate({ body: sensorSchema }), (req,res,next) => {
   })
 })
 
-router.delete("/", validate({ body: sensorPKSchema }), (req,res,next) => {
-  let username = 'default'
+router.delete("/", [validate({ body: sensorPKSchema }),verifyTokenMiddleware], (req,res,next) => {
+  let username = req.username
   const payload = req.body
   const query = 'DELETE FROM SENSORS WHERE "id" = $1 AND "room_user"= $2'
   const data = [payload.id,username]
@@ -90,9 +90,9 @@ router.delete("/", validate({ body: sensorPKSchema }), (req,res,next) => {
 })
 
 /*Restituisce lo stato attuale di tutti i sensori*/
-router.get("/state", (req,res,next) => {
+router.get("/state", [verifyTokenMiddleware], (req,res,next) => {
   //console.log(process.env.STACKHERO_INFLUXDB_HOST,process.env.STACKHERO_INFLUXDB_ADMIN_ORGANIZATION,process.env.INFLUX_API_TOKEN)
-  let username = 'default'
+  let username = req.username
   let state = {
     sensor_status:{},
     analog_sensor_data:{},
@@ -153,7 +153,7 @@ router.get("/state", (req,res,next) => {
     })
   })
 
-  /*FETCH MOVEMENT READINGS IN LAST 10 MINUTES*/
+  /*FETCH MOVEMENT READINGS IN LAST 1 MINUTE*/
   const promise3 = new Promise((resolve,reject) => {
     query=`
     from(bucket:"admin")

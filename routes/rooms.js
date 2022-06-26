@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const postgres = require('../postgres')
 const { Validator } = require("express-json-validator-middleware");
+const { verifyTokenMiddleware } = require('../middleware/authentication-middleware');
 const { validate } = new Validator();
 
 const roomSchema = {
@@ -45,8 +46,8 @@ const roomPKSchema = {
 };
 
 /*Restituisce tutte le stanze dell'utente*/
-router.get("/", (req,res,next) => {
-  let username = 'default'
+router.get("/", [verifyTokenMiddleware], (req,res,next) => {
+  let username = req.username
   const query = 'SELECT * FROM ROOMS WHERE "user"=$1'
   const data = [username]
   console.log("GETTING ROOMS:",...data)
@@ -73,8 +74,8 @@ router.get("/", (req,res,next) => {
 })
 
 /*Aggiunge una stanza all'utente*/
-router.post("/", validate({ body: roomSchema }), (req,res,next) => {
-  let username = 'default'
+router.post("/", [validate({ body: roomSchema }), verifyTokenMiddleware], (req,res,next) => {
+  let username = req.username
   const payload = req.body
   const query = 'INSERT INTO ROOMS("name","user","colorRed","colorGreen","colorBlue","colorAlpha") VALUES ($1,$2,$3,$4,$5,$6)'
   const data = [payload.name,username,payload.color.red,payload.color.green,payload.color.blue,payload.color.alpha]
@@ -91,8 +92,8 @@ router.post("/", validate({ body: roomSchema }), (req,res,next) => {
 })
 
 /*Elimina una stanza dell'utente*/
-router.delete("/", validate({ body: roomPKSchema }), (req,res,next) => {
-  let username = 'default'
+router.delete("/", [validate({ body: roomPKSchema }), verifyTokenMiddleware], (req,res,next) => {
+  let username = req.username
   const payload = req.body
   const query = 'DELETE FROM ROOMS WHERE "name" = $1 AND "user" = $2'
   const data = [payload.name,username]
