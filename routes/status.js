@@ -63,6 +63,7 @@ router.post("/alarmed", [validate({ body: setAlarmedSchema }), verifyTokenMiddle
     }
     else return res.status(200).json({status:"SUCCESS", message:"Status was set successfully"})
   }).catch((error)=>{
+    console.log(error)
     return res.status(400).json({status:"ERROR", message:"Couldn't set status"})
   })
 })
