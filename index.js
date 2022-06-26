@@ -11,10 +11,12 @@ const cameraRouter = require("./routes/cameras")
 const roomRouter = require("./routes/rooms")
 const sensorRouter = require("./routes/sensors")
 const authRouter = require("./routes/auth")
+const statusRouter = require("./routes/status")
+const telegrafRouter = require("./routes/telegraf")
+
 const PORT = process.env.PORT || 5000
 
 const app = express()
-
 
 postgres.connect().then(()=>{
   console.log('[DB] Successfully connected to Postgres')
@@ -25,16 +27,10 @@ postgres.connect().then(()=>{
   app.use("/rooms", roomRouter)
   app.use("/sensors", sensorRouter)
   app.use("/auth", authRouter)
-  app.post("/",(req,res,next)=>{
-    console.log(req.body)
-    res.status(200).json("wewe")
-    next()
-  })
+  app.use("/status", statusRouter)
+  app.use("/telegraf", telegrafRouter)
+  
   app.use(validationErrorMiddleware)
-    //.use(express.static(path.join(__dirname, 'public')))
-    //.set('views', path.join(__dirname, 'views'))
-    //.set('view engine', 'ejs')
-    //.get('/', (req, res) => res.render('pages/index'))
   
   console.log('[EXPRESS] Routes attached')
 

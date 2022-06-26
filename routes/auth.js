@@ -60,7 +60,7 @@ router.post('/login', validate({ body: loginSchema }), (req,res) => {
   const data = [payload.username]
   postgres.getClient().query(query, data, (error,result) => {
     if(error){
-      return res.status(400).json({status: "ERROR", error: error, stack:error.stack})
+      return res.status(400).json({status: "ERROR", message: error.message})
     }
     if(result.rows.length==0){
       return res.status(400).json({status: "ERROR", message: "User not found"})
