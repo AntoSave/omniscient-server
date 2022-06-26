@@ -5,6 +5,7 @@ const {Point} = require('@influxdata/influxdb-client')
 const { Validator } = require("express-json-validator-middleware");
 const { validate } = new Validator();
 const mqttClient = require('../mqtt')
+const postgres = require('../postgres')
 
 const setAlarmedSchema = {
 	type: "object",
