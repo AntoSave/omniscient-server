@@ -7,12 +7,14 @@ const {parse} = require('url')
 const bodyParser = require('body-parser');
 const postgres = require('./postgres')
 const validationErrorMiddleware = require('./middleware/validation-middleware')
+const {verifyToken} = require('./middleware/authentication-middleware')
 const cameraRouter = require("./routes/cameras")
 const roomRouter = require("./routes/rooms")
 const sensorRouter = require("./routes/sensors")
 const authRouter = require("./routes/auth")
 const statusRouter = require("./routes/status")
 const telegrafRouter = require("./routes/telegraf")
+const actuatorRouter = require("./routes/actuators")
 
 const PORT = process.env.PORT || 5000
 
@@ -26,6 +28,7 @@ postgres.connect().then(()=>{
   app.use("/cameras", cameraRouter)
   app.use("/rooms", roomRouter)
   app.use("/sensors", sensorRouter)
+  app.use("/actuators", actuatorRouter)
   app.use("/auth", authRouter)
   app.use("/status", statusRouter)
   app.use("/telegraf", telegrafRouter)
@@ -38,7 +41,7 @@ postgres.connect().then(()=>{
   
   server.on('upgrade',function upgrade(request, socket, head) {
     const { pathname } = parse(request.url);
-    if (pathname === '/sensor') { //Abilita il protocollo websocket sulla route /sensor
+    if (pathname === '/sensor' && verifyToken(request)) { //Abilita il protocollo websocket sulla route /sensor
       wss.handleUpgrade(request, socket, head, function done(ws) {
         wss.emit('connection', ws, request);
       });

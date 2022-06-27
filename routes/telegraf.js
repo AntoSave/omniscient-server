@@ -3,12 +3,17 @@ const router = express.Router()
 const postgres = require('../postgres')
 const influx = require('../influx')
 const mqttClient = require('../mqtt')
+const {publish} = require('../modules/pubsub')
 
 router.post("/",(req,res)=>{
   //console.log(req.body)
   if(!req.body.metrics){
     return res.status(200).json("ok")
   }
+  //Notifica i client
+  req.body.metrics
+    .filter(element => element.name == 'sensor_value')
+    .forEach(element => publish(element.tags.sensor_id,element.fields.value))
   //Filtra gli eventi che possono innescare l'allarme
   let sensors_to_check = req.body.metrics
     .filter(element => element.name == 'sensor_value' && (element.tags.sensor_type=='MOVEMENT' || (element.tags.sensor_type=='DOOR' && element.fields.value=='OPEN')))

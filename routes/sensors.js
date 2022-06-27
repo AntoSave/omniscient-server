@@ -4,7 +4,8 @@ const postgres = require('../postgres')
 const influx = require('../influx')
 const { Validator } = require("express-json-validator-middleware");
 const { validate } = new Validator();
-const {verifyTokenMiddleware} = require('../middleware/authentication-middleware')
+const {verifyTokenMiddleware, userOwnsSensorMiddleware} = require('../middleware/authentication-middleware')
+
 const sensorSchema = {
 	type: "object",
 	required: ["id","name","type","room_name"],

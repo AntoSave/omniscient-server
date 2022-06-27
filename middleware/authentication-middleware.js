@@ -1,3 +1,4 @@
+const { consoleLogger } = require("@influxdata/influxdb-client");
 const jwt = require("jsonwebtoken");
 const postgres = require('../postgres')
 
@@ -21,28 +22,32 @@ verifyTokenMiddleware = (req, res, next) => {
   });
 };
 
-userOwnsSensor = (username,sensor_id) => {
+userOwnsSensor = async (username,sensor_id) => {
   const query = 'SELECT * FROM SENSORS WHERE id=$1 and room_user=$2'
   const data = [sensor_id, username]
-  postgres.getClient().query(query, data, (error,result) => {
-    if(error){
-      return false
-    }
-    if(result.rowCount==0){
-      return false
-    }
-    return true
-  })
+  try{
+    let result = await postgres.getClient().query(query, data)
+    console.log(username,sensor_id,result.rowCount,result.rowCount != 0)
+    return (result.rowCount != 0)
+  } catch (ex) {
+    console.log("Exception",ex.message)
+    return false
+  }
 }
 
-userOwnsSensorMiddleware = (sensor_id) => (req,res,next) => {
+userOwnsSensorMiddleware = (req,res,next) => {
   if(!req.username){
     return res.status(401).send({
       status:"ERROR",
       message: "Unauthorized!"
     });
   }
-
+  if(!req.body.id){
+    return res.status(400).send({
+      status:"ERROR",
+      message: "Bad request!"
+    });
+  }
   const query = 'SELECT * FROM SENSORS WHERE id=$1 and room_user=$2'
   const data = [sensor_id, req.username]
   postgres.getClient().query(query, data, (error,result) => {
@@ -56,10 +61,24 @@ userOwnsSensorMiddleware = (sensor_id) => (req,res,next) => {
   })
 }
 
-
+verifyToken = (req) => {
+  let token = req.headers["x-access-token"];
+  if (!token) {
+    return false;
+  }
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.username = decoded.username;
+    return true;
+  } catch (ex) { 
+  console.log(ex.message)
+  return false
+  }
+};
 
 module.exports = {
   verifyTokenMiddleware,
   userOwnsSensorMiddleware,
-  userOwnsSensor
+  userOwnsSensor,
+  verifyToken
 };
