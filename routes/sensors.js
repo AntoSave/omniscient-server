@@ -40,19 +40,18 @@ const sensorPKSchema = {
 };
 
 /*Restituisce tutti i sensori dell'utente*/
-router.get("/", [verifyTokenMiddleware], (req,res,next) => {
+router.get("/", [verifyTokenMiddleware], (req,res) => {
   let username = req.username
   const query = 'SELECT * FROM SENSORS WHERE room_user=$1'
   const data = [username]
   console.log("GETTING SENSORS:",...data)
   postgres.getClient().query(query, data, (error,result) => {
     if(error){
-      res.status(400).json({status: "ERROR", error: error, stack:error.stack})
+      return res.status(400).json({status: "ERROR", error: error, stack:error.stack})
     }
     else {
-      res.status(200).json([...result.rows])
+      return res.status(200).json([...result.rows])
     }
-    next()
   })
 })
 
@@ -64,16 +63,15 @@ router.post("/", [validate({ body: sensorSchema }),verifyTokenMiddleware], (req,
   console.log("CREATING SENSOR:",...data)
   postgres.getClient().query(query, data, (error,result) => {
     if(error){
-      res.status(400).json({status: "ERROR", error: error, stack:error.stack})
+      return res.status(400).json({status: "ERROR", error: error, stack:error.stack})
     }
     else {
-      res.status(200).json({status: "SUCCESS", rows_number:result.rowCount})
+      return res.status(200).json({status: "SUCCESS", rows_number:result.rowCount})
     }
-    next()
   })
 })
 
-router.delete("/", [validate({ body: sensorPKSchema }),verifyTokenMiddleware], (req,res,next) => {
+router.delete("/", [validate({ body: sensorPKSchema }),verifyTokenMiddleware], (req,res) => {
   let username = req.username
   const payload = req.body
   const query = 'DELETE FROM SENSORS WHERE "id" = $1 AND "room_user"= $2'
@@ -81,12 +79,11 @@ router.delete("/", [validate({ body: sensorPKSchema }),verifyTokenMiddleware], (
   console.log("DELETING SENSOR:",...data)
   postgres.getClient().query(query, data, (error,result) => {
     if(error){
-      res.status(400).json({status: "ERROR", error: error, stack:error.stack})
+      return res.status(400).json({status: "ERROR", error: error, stack:error.stack})
     }
     else {
-      res.status(200).json({status: "SUCCESS", rows_number:result.rowCount})
+      return res.status(200).json({status: "SUCCESS", rows_number:result.rowCount})
     }
-    next()
   })
 })
 
@@ -215,6 +212,45 @@ router.get("/state", [verifyTokenMiddleware], (req,res,next) => {
     .then(()=>res.status(200).json(state))
     .catch((error)=>res.status(400).json({status: "ERROR", error: error}))
     .finally(next)
+})
+
+router.get("/connection_status", [verifyTokenMiddleware], async (req,res) => {
+  let username = req.username
+  //Get user sensors
+  const pgQuery = 'SELECT * FROM SENSORS WHERE room_user=$1'
+  const data = [username]
+  console.log("GETTING SENSORS:",...data)
+  try{
+    let result = await postgres.getClient().query(pgQuery, data)
+    let sensor_ids = result.rows.map(e => e.id)
+    var sensor_status = {}
+    console.log(`[${sensor_ids.map(e=>"\""+e+"\"")}]`)
+    const influxQuery=`
+    sensor_ids = [${sensor_ids.map(e=>"\""+e+"\"")}]
+
+    from(bucket:"admin")
+      |> range(start: -1y)
+      |> filter(fn:(r) => r["_measurement"] == "sensor_status" and r["_field"] == "connection_status" and contains(value: r["sensor_id"], set: sensor_ids))
+      |> group(columns: ["sensor_id"])
+      |> last()
+    `
+    influx.queryApi.queryRows(influxQuery,{
+      next: (row,tableMeta) => {
+        const o = tableMeta.toObject(row)
+        //console.log(o)
+        sensor_status[o.sensor_id]={
+          id:o.sensor_id,
+          status:o._value
+        }
+      },
+      error: error => {throw error},
+      complete: () => {
+        return res.status(200).json(sensor_status)
+      }
+    })
+  } catch (ex) {
+    return res.status(400).json({status: "ERROR", message:error.message})
+  }
 })
 
 module.exports = router

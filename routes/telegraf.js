@@ -12,8 +12,8 @@ router.post("/",(req,res)=>{
   }
   //Notifica i client
   req.body.metrics
-    .filter(element => element.name == 'sensor_value')
-    .forEach(element => publish(element.tags.sensor_id,element.fields.value))
+    //.filter(element => element.name == 'sensor_value')
+    .forEach(element => publish(element.tags.sensor_id,{type:element.name,value:element.fields.value||element.fields.connection_status}))
   //Filtra gli eventi che possono innescare l'allarme
   let sensors_to_check = req.body.metrics
     .filter(element => element.name == 'sensor_value' && (element.tags.sensor_type=='MOVEMENT' || (element.tags.sensor_type=='DOOR' && element.fields.value=='OPEN')))
