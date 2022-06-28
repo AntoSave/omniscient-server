@@ -41,7 +41,7 @@ postgres.connect().then(()=>{
   
   server.on('upgrade',function upgrade(request, socket, head) {
     const { pathname } = parse(request.url);
-    console.log("sono qui",request,verifyToken(request))
+    //console.log("sono qui",request,verifyToken(request))
     if (pathname === '/sensor' && verifyToken(request)) { //Abilita il protocollo websocket sulla route /sensor
       wss.handleUpgrade(request, socket, head, function done(ws) {
         wss.emit('connection', ws, request);
