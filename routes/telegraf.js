@@ -61,7 +61,7 @@ router.post("/",(req,res)=>{
         complete: () => {
           console.log(user,alarmed,buzzers)
           if(alarmed){
-            buzzers.forEach(element => mqttClient.publish(`NOCTUA/BUZZER/${element}/STATE`,'ON'))
+            buzzers.forEach(element => mqttClient.publish(`OMNISCIENT/BUZZER/${element}/STATE`,'ON'))
           }
           res.status(200).json("ok")
         }
