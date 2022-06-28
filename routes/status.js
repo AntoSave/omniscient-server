@@ -58,7 +58,7 @@ router.post("/alarmed", [validate({ body: setAlarmedSchema }), verifyTokenMiddle
           console.log(error)
           return res.status(400).json({status:"ERROR", message:"Couldn't disable buzzers"})
         }
-        result.rows.forEach(element => {mqttClient.publish(`NOCTUA/BUZZER/${element.id}/STATE`,'OFF')})
+        result.rows.forEach(element => {mqttClient.publish(`OMNISCIENT/BUZZER/${element.id}/STATE`,'OFF')})
         return res.status(200).json({status:"SUCCESS", message:"Status was set successfully"})
       })
     }
