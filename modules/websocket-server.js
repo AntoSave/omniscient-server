@@ -23,13 +23,14 @@ wss.on('connection',(socket,request,client) => {
       payload = JSON.parse(message)
     } catch (ex) {
       console.log("Exception",ex.message)
+      socket.send(JSON.stringify({status:"error",message:ex.message}))
       return
     }
     console.log('Received: ', payload)
     var isValid = v.validate(payload, payloadSchema).valid
     if(!isValid){
       console.log("Not valid")
-      socket.send({status:"error",message:"Invalid message formatting!"})
+      socket.send(JSON.stringify({status:"error",message:"Invalid message formatting!"}))
       return
     }
     console.log("Valid")
@@ -38,16 +39,16 @@ wss.on('connection',(socket,request,client) => {
         let usrOwnsSensor = await userOwnsSensor(request.username,payload.sensor_id)
         if(!usrOwnsSensor){
           console.log("User doesn't own sensor!")
-          socket.send({status:"error",message:"User doesn't own sensor!"})
+          socket.send(JSON.stringify({status:"error",message:"User doesn't own sensor!"}))
           return
         }
         console.log("Subscribing")
-        socket.send({status:"success",message:"Successfully subscribed to " + payload.sensor_id})
+        socket.send(JSON.stringify({status:"success",message:"Successfully subscribed to " + payload.sensor_id}))
         subscribe(socket,payload.sensor_id)
         break
       case 'unsubscribe':
         console.log("Unsubscribing")
-        socket.send({status:"success",message:"Successfully unsubscribed to " + payload.sensor_id})
+        socket.send(JSON.stringify({status:"success",message:"Successfully unsubscribed to " + payload.sensor_id}))
         unsubscribe(socket,payload.sensor_id)
         break
     }
