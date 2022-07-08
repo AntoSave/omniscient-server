@@ -47,6 +47,11 @@ postgres.connect().then(()=>{
         wss.emit('connection', ws, request);
       });
     } else {
+      //wss.handleUpgrade(request, socket, head, function done(ws) {
+        //ws.send({status:"error",message:"User doesn't own sensor!"})
+        //console.log(ws)
+      //});
+      //socket.destroy();
       socket.destroy();
     }
   })

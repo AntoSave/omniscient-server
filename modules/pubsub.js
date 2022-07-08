@@ -70,8 +70,8 @@ function publish(topic,data){
   topic_subscriptions[topic].forEach(client_id => {
     let ws = client_ids[client_id]
     let payload = {
-      topic: topic,
-      message: data
+      sensor_id: topic,
+      value: data
     }
     ws.send(JSON.stringify(payload))
   });
