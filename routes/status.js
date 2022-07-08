@@ -1,11 +1,11 @@
 const express = require('express')
 const router = express.Router()
-const influx = require('../influx')
+const influx = require('../interfaces/influx')
 const {Point} = require('@influxdata/influxdb-client')
 const { Validator } = require("express-json-validator-middleware");
 const { validate } = new Validator();
-const mqttClient = require('../mqtt')
-const postgres = require('../postgres')
+const mqttClient = require('../interfaces/mqtt')
+const postgres = require('../interfaces/postgres')
 
 const setAlarmedSchema = {
 	type: "object",

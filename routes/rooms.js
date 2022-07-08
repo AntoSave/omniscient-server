@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const postgres = require('../postgres')
+const postgres = require('../interfaces/postgres')
 const { Validator } = require("express-json-validator-middleware");
 const { verifyTokenMiddleware } = require('../middleware/authentication-middleware');
 const { validate } = new Validator();

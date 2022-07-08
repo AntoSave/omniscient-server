@@ -1,6 +1,6 @@
 const { consoleLogger } = require("@influxdata/influxdb-client");
 const jwt = require("jsonwebtoken");
-const postgres = require('../postgres')
+const postgres = require('../interfaces/postgres')
 
 verifyTokenMiddleware = (req, res, next) => {
   let token = req.headers["x-access-token"];

@@ -1,8 +1,8 @@
 const express = require('express')
 const router = express.Router()
-const postgres = require('../postgres')
-const influx = require('../influx')
-const mqttClient = require('../mqtt')
+const postgres = require('../interfaces/postgres')
+const influx = require('../interfaces/influx')
+const mqttClient = require('../interfaces/mqtt')
 const {publish} = require('../modules/pubsub')
 
 router.post("/",(req,res)=>{
