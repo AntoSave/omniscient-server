@@ -112,6 +112,7 @@ router.get("/state", [verifyTokenMiddleware], async (req,res,next) => {
         |> range(start: -1y)
         |> filter(fn:(r) => r["_measurement"] == "sensor_status" and r["_field"] == "connection_status" and contains(value: r["sensor_id"], set: sensor_ids))
         |> group(columns: ["sensor_id"])
+        |> sort(columns: ["_time"])
         |> last()
       `
       //console.log("SENSOR STATUS")
@@ -246,6 +247,7 @@ router.get("/connection_status", [verifyTokenMiddleware], async (req,res) => {
       |> range(start: -1y)
       |> filter(fn:(r) => r["_measurement"] == "sensor_status" and r["_field"] == "connection_status" and contains(value: r["sensor_id"], set: sensor_ids))
       |> group(columns: ["sensor_id"])
+      |> sort(columns: ["_time"])
       |> last()
     `
     influx.queryApi.queryRows(influxQuery,{
