@@ -1,5 +1,5 @@
 # Omniscient Node.js Application Server
-Omniscient is an open source platform for home monitoring and security. It is composed of sensors, alarms, an iOS app and an application server.
+Omniscient is an open source solution for home monitoring and security. It is composed of sensors, alarms, an iOS app and an application server.
 ![Omniscient back-end architecture](/assets/images/back-end-architecture.png)
 
 This repository contains the Node.js application server which:
